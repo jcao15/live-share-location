@@ -11,6 +11,7 @@ import android.media.audiofx.Equalizer
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.provider.Settings
+import android.util.Log
 import androidx.core.app.ActivityCompat
 
 import com.google.android.gms.maps.CameraUpdateFactory
@@ -22,6 +23,7 @@ import com.google.android.gms.maps.model.MarkerOptions
 import com.example.live_share_location.databinding.ActivityMapsBinding
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
+import com.google.firebase.firestore.FirebaseFirestore
 
 class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
 
@@ -29,6 +31,8 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
     private lateinit var binding: ActivityMapsBinding
     private lateinit var fusedLocationClient: FusedLocationProviderClient
     private lateinit var userOne: User
+
+    private val db = FirebaseFirestore.getInstance()          // Firestore database
 
     @SuppressLint("MissingPermission")
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -38,6 +42,9 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
         setContentView(binding.root)
 
         userOne = User("User One", 0.0, 0.0)
+
+        addUser(userOne)
+
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
         getCurrentLocation();
 
@@ -47,7 +54,17 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
         mapFragment.getMapAsync(this)
 
     }
+    private fun addUser(user: User){
+        db.collection("users")
+            .add(user)
+            .addOnSuccessListener { documentReference ->
+                Log.i("ADD","DocumentSnapshot added with ID: ${documentReference.id}")
+            }
+            .addOnFailureListener { e ->
+                Log.i("Error",e.toString())
 
+            }
+    }
     private fun getCurrentLocation(){
         if(checkPermissions()) {
             if(isLocationEnabled()) {
