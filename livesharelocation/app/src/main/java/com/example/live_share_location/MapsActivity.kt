@@ -43,8 +43,6 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
 
         userOne = User("User One", 0.0, 0.0)
 
-        addUser(userOne)
-
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
         getCurrentLocation();
 
@@ -84,6 +82,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
                     val location: Location= task.result
                     userOne.lat = location.latitude
                     userOne.lon = location.longitude
+                    addUser(userOne)
                 }
 
             } else {
